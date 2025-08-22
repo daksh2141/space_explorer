@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Explorer - Journey Through the Cosmos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c1e 0%, #1a1a2e 25%, #16213e 50%, #0f0f23 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated starfield background */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            font-weight: bold;
+            text-align: center;
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 25%, #ff6b6b 50%, #4ecdc4 75%, #45b7d1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(79, 172, 254, 0.5);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(30px);
+            color: #b8b8b8;
+        }
+
+        .cta-button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Floating spaceship */
+        .spaceship {
+            position: absolute;
+            top: 20%;
+            right: -100px;
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px 5px 5px 20px;
+            opacity: 0;
+        }
+
+        .spaceship::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-right: 25px solid #667eea;
+        }
+
+        /* Planets Section */
+        .planets-section {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .planets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .planet-card {
+            position: relative;
+            padding: 2rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .planet-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(79, 172, 254, 0.5);
+            box-shadow: 0 20px 40px rgba(79, 172, 254, 0.2);
+        }
+
+        .planet-sphere {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .planet-sphere:hover {
+            transform: scale(1.1) rotateY(180deg);
+        }
+
+        /* Planet 3D visualizations with realistic colors and textures */
+        .mercury { 
+            background: linear-gradient(135deg, #8c7853 0%, #a0906c 25%, #6b5b3f 75%, #4a3f2a 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), 0 0 20px rgba(140,120,83,0.3);
+        }
+        .venus { 
+            background: linear-gradient(135deg, #ffc649 0%, #ffb347 25%, #ff9500 75%, #e67e22 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2), 0 0 25px rgba(255,198,73,0.4);
+        }
+        .earth { 
+            background: linear-gradient(135deg, #6fa8dc 0%, #38761d 25%, #0b5394 50%, #134f5c 75%, #1c4587 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), 0 0 30px rgba(111,168,220,0.5);
+            position: relative;
+        }
+        .earth::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            width: 40%;
+            height: 30%;
+            background: #38761d;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+        .earth::after {
+            content: '';
+            position: absolute;
+            top: 60%;
+            right: 20%;
+            width: 25%;
+            height: 20%;
+            background: #38761d;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        .mars { 
+            background: linear-gradient(135deg, #cd5c5c 0%, #a0522d 25%, #8b4513 75%, #654321 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.4), 0 0 20px rgba(205,92,92,0.4);
+        }
+        .jupiter { 
+            background: linear-gradient(135deg, #daa520 0%, #b8860b 25%, #cd853f 50%, #8b4513 75%, #daa520 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), 0 0 35px rgba(218,165,32,0.4);
+            position: relative;
+        }
+        .jupiter::before {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 0;
+            width: 100%;
+            height: 15%;
+            background: linear-gradient(90deg, transparent, rgba(139,69,19,0.6), transparent);
+            border-radius: 50px;
+        }
+        .jupiter::after {
+            content: '';
+            position: absolute;
+            top: 60%;
+            left: 0;
+            width: 100%;
+            height: 10%;
+            background: linear-gradient(90deg, transparent, rgba(160,82,45,0.5), transparent);
+            border-radius: 50px;
+        }
+        .saturn { 
+            background: linear-gradient(135deg, #fad5a5 0%, #daa520 25%, #b8860b 75%, #8b6914 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), 0 0 30px rgba(250,213,165,0.4);
+            position: relative;
+        }
+        .saturn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 180px;
+            border: 3px solid rgba(218,165,32,0.6);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 0 8px rgba(218,165,32,0.3),
+                0 0 0 16px rgba(218,165,32,0.2);
+        }
+        .uranus { 
+            background: linear-gradient(135deg, #4fd0e7 0%, #3f9cbb 25%, #2980b9 75%, #1f618d 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), 0 0 25px rgba(79,208,231,0.4);
+        }
+        .neptune { 
+            background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 25%, #1e40af 75%, #1e3a8a 100%);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.4), 0 0 30px rgba(65,105,225,0.5);
+        }
+
+        .planet-name {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #4facfe;
+        }
+
+        .planet-info {
+            font-size: 0.9rem;
+            color: #b8b8b8;
+            line-height: 1.6;
+        }
+
+        /* Missions Timeline */
+        .missions-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .timeline {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .mission-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+
+        .mission-item:nth-child(even) {
+            flex-direction: row-reverse;
+            transform: translateX(100px);
+        }
+
+        .mission-date {
+            flex: 0 0 150px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4facfe;
+            text-align: center;
+        }
+
+        .mission-content {
+            flex: 1;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin: 0 2rem;
+            border-left: 4px solid #4facfe;
+        }
+
+        .mission-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .mission-description {
+            color: #b8b8b8;
+            line-height: 1.6;
+        }
+
+        /* Footer Control Panel */
+        .footer {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 3rem 0;
+            border-top: 1px solid rgba(79, 172, 254, 0.3);
+            position: relative;
+        }
+
+        .control-panel {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .control-section {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+
+        .control-title {
+            color: #4facfe;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .offline { background: #ff4444; box-shadow: 0 0 10px #ff4444; }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1200px) {
+            .hero-title { font-size: 4.5rem; }
+            .planets-grid { 
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 2rem;
+                max-width: 1000px;
+            }
+            .control-panel {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-title { font-size: 4rem; }
+            .hero-subtitle { font-size: 1.3rem; }
+            .section-title { font-size: 2.5rem; }
+            
+            .planets-grid { 
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 1.5rem;
+                padding: 0 1.5rem;
+            }
+            
+            .planet-sphere {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .timeline {
+                padding: 0 1.5rem;
+            }
+            
+            .mission-content {
+                padding: 1.5rem;
+                margin: 0 1rem;
+            }
+            
+            .control-panel {
+                padding: 0 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 0 1rem;
+                text-align: center;
+            }
+            
+            .hero-title { 
+                font-size: 3rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .hero-subtitle { 
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+                padding: 0 1rem;
+            }
+            
+            .cta-button {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+            
+            .section-title { 
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+            
+            .planets-section {
+                padding: 80px 0;
+            }
+            
+            .planets-grid { 
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 1.5rem;
+                padding: 0 1rem;
+            }
+            
+            .planet-card {
+                padding: 1.5rem;
+            }
+            
+            .planet-sphere {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .planet-name {
+                font-size: 1.3rem;
+            }
+            
+            .planet-info {
+                font-size: 0.85rem;
+            }
+            
+            .missions-section {
+                padding: 80px 0;
+            }
+            
+            .mission-item { 
+                flex-direction: column !important;
+                text-align: center;
+                margin-bottom: 3rem;
+                transform: translateY(50px) !important;
+            }
+            
+            .mission-item:nth-child(even) { 
+                transform: translateY(50px) !important;
+            }
+            
+            .mission-date { 
+                margin-bottom: 1rem;
+                font-size: 1.5rem;
+                flex: none;
+            }
+            
+            .mission-content {
+                margin: 0;
+                border-left: none;
+                border-top: 4px solid #4facfe;
+                padding: 1.5rem;
+            }
+            
+            .mission-title {
+                font-size: 1.3rem;
+            }
+            
+            .mission-description {
+                font-size: 0.85rem;
+            }
+            
+            .footer {
+                padding: 2rem 0;
+            }
+            
+            .control-panel {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 0 1rem;
+            }
+            
+            .control-section {
+                padding: 1.2rem;
+            }
+            
+            .control-title {
+                font-size: 1.1rem;
+            }
+            
+            /* Hide spaceship on mobile for better performance */
+            .spaceship {
+                display: none;
+            }
+            
+            /* Adjust Saturn rings for mobile */
+            .saturn::before {
+                width: 140px;
+                height: 140px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-title { 
+                font-size: 2.5rem;
+                line-height: 1.2;
+            }
+            
+            .hero-subtitle { 
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .cta-button {
+                padding: 10px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .section-title { 
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .planets-grid { 
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+                padding: 0 0.5rem;
+            }
+            
+            .planet-card {
+                padding: 1.2rem;
+            }
+            
+            .planet-sphere {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .planet-name {
+                font-size: 1.2rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .planet-info {
+                font-size: 0.8rem;
+                line-height: 1.5;
+            }
+            
+            .mission-date {
+                font-size: 1.3rem;
+            }
+            
+            .mission-title {
+                font-size: 1.2rem;
+            }
+            
+            .mission-description {
+                font-size: 0.8rem;
+            }
+            
+            .control-section {
+                padding: 1rem;
+            }
+            
+            .control-title {
+                font-size: 1rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .control-item {
+                padding: 0.4rem 0;
+                font-size: 0.85rem;
+            }
+            
+            /* Further adjust Saturn rings for small screens */
+            .saturn::before {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hero {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .hero-title { 
+                font-size: 2.2rem;
+            }
+            
+            .planets-section, .missions-section {
+                padding: 60px 0;
+            }
+            
+            .planet-sphere {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .saturn::before {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* Landscape orientation adjustments for tablets */
+        @media (max-width: 1024px) and (orientation: landscape) {
+            .hero {
+                padding: 2rem 0;
+            }
+            
+            .hero-title { 
+                font-size: 3.5rem;
+            }
+            
+            .planets-grid { 
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .planet-sphere {
+                width: 85px;
+                height: 85px;
+            }
+        }
+
+        /* High DPI display adjustments */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .planet-sphere {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+            
+            .starfield {
+                will-change: transform;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Starfield -->
+    <div class="starfield" id="starfield"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">SPACE EXPLORER</h1>
+        <p class="hero-subtitle">Journey Through the Infinite Cosmos</p>
+        <button class="cta-button" onclick="exploreSpace()">Begin Exploration</button>
+        <div class="spaceship"></div>
+    </section>
+
+    <!-- Planets Section -->
+    <section class="planets-section">
+        <h2 class="section-title">Discover Planets</h2>
+        <div class="planets-grid">
+            <div class="planet-card">
+                <div class="planet-sphere mercury"></div>
+                <h3 class="planet-name">Mercury</h3>
+                <p class="planet-info">The closest planet to the Sun, with extreme temperature variations and a heavily cratered surface resembling our Moon.</p>
+            </div>
+            <div class="planet-card">
+                <div class="planet-sphere venus"></div>
+                <h3 class="planet-name">Venus</h3>
+                <p class="planet-info">The hottest planet with thick toxic clouds and surface temperatures of 900°F, hot enough to melt lead.</p>
+            </div>
+            <div class="planet-card">
+                <div class="planet-sphere earth"></div>
+                <h3 class="planet-name">Earth</h3>
+                <p class="planet-info">Our blue marble home, the only known planet with life, featuring vast oceans and diverse ecosystems.</p>
+            </div>
+            <div class="planet-card">
+                <div class="planet-sphere mars"></div>
+                <h3 class="planet-name">Mars</h3>
+                <p class="planet-info">The Red Planet, our next frontier for human exploration with its ancient riverbeds and polar ice caps.</p>
+            </div>
+            <div class="planet-card">
+                <div class="planet-sphere jupiter"></div>
+                <h3 class="planet-name">Jupiter</h3>
+                <p class="planet-info">The giant guardian of our solar system, with its Great Red Spot storm and 79 known moons.</p>
+            </div>
+            <div class="planet-card">
+                <div class="planet-sphere saturn"></div>
+                <h3 class="planet-name">Saturn</h3>
+                <p class="planet-info">The ringed beauty, famous for its spectacular ring system made of ice and rock particles.</p>
+            </div>
+            <div class="planet-card">
+                <div class="planet-sphere uranus"></div>
+                <h3 class="planet-name">Uranus</h3>
+                <p class="planet-info">The tilted ice giant, rotating on its side with methane clouds giving it a distinctive blue-green color.</p>
+            </div>
+            <div class="planet-card">
+                <div class="planet-sphere neptune"></div>
+                <h3 class="planet-name">Neptune</h3>
+                <p class="planet-info">The windiest planet with supersonic winds reaching 2,100 km/h in its deep blue atmosphere.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Missions Timeline -->
+    <section class="missions-section">
+        <h2 class="section-title">Upcoming Missions</h2>
+        <div class="timeline">
+            <div class="mission-item">
+                <div class="mission-date">2025</div>
+                <div class="mission-content">
+                    <h3 class="mission-title">Artemis III Moon Landing</h3>
+                    <p class="mission-description">NASA's ambitious mission to return humans to the lunar surface for the first time since 1972, establishing a sustainable presence on the Moon.</p>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="mission-date">2026</div>
+                <div class="mission-content">
+                    <h3 class="mission-title">Mars Sample Return</h3>
+                    <p class="mission-description">A joint NASA-ESA mission to retrieve samples collected by the Perseverance rover and bring them back to Earth for detailed analysis.</p>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="mission-date">2028</div>
+                <div class="mission-content">
+                    <h3 class="mission-title">Europa Clipper Arrival</h3>
+                    <p class="mission-description">NASA's spacecraft will arrive at Jupiter's moon Europa to study its subsurface ocean and assess its potential for harboring life.</p>
+                </div>
+            </div>
+            <div class="mission-item">
+                <div class="mission-date">2030</div>
+                <div class="mission-content">
+                    <h3 class="mission-title">First Mars Human Mission</h3>
+                    <p class="mission-description">The groundbreaking mission that will send the first humans to Mars, marking a new era in space exploration and interplanetary travel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Control Panel -->
+    <footer class="footer">
+        <div class="control-panel">
+            <div class="control-section">
+                <h3 class="control-title">Mission Control</h3>
+                <div class="control-item">
+                    <span>Satellite Network</span>
+                    <div class="status-light"></div>
+                </div>
+                <div class="control-item">
+                    <span>Deep Space Comm</span>
+                    <div class="status-light"></div>
+                </div>
+                <div class="control-item">
+                    <span>Mars Rover Link</span>
+                    <div class="status-light offline"></div>
+                </div>
+            </div>
+            <div class="control-section">
+                <h3 class="control-title">System Status</h3>
+                <div class="control-item">
+                    <span>Telescope Array</span>
+                    <div class="status-light"></div>
+                </div>
+                <div class="control-item">
+                    <span>Navigation</span>
+                    <div class="status-light"></div>
+                </div>
+                <div class="control-item">
+                    <span>Life Support</span>
+                    <div class="status-light"></div>
+                </div>
+            </div>
+            <div class="control-section">
+                <h3 class="control-title">Data Streams</h3>
+                <div class="control-item">
+                    <span>Solar Wind Monitor</span>
+                    <div class="status-light"></div>
+                </div>
+                <div class="control-item">
+                    <span>Exoplanet Scanner</span>
+                    <div class="status-light"></div>
+                </div>
+                <div class="control-item">
+                    <span>Cosmic Ray Detector</span>
+                    <div class="status-light offline"></div>
+                </div>
+            </div>
+            <div class="control-section">
+                <h3 class="control-title">Contact</h3>
+                <p style="color: #b8b8b8; font-size: 0.9rem;">
+                    Space Explorer Mission Control<br>
+                    Coordinates: Sol System, Earth<br>
+                    Frequency: 2.3 GHz Universal
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Register ScrollTrigger plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Create animated starfield
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const numStars = 150;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starfield.appendChild(star);
+            }
+        }
+
+        // Initialize animations when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            createStarfield();
+            initAnimations();
+        });
+
+        // Enhanced responsive animations
+        function initAnimations() {
+            // Hero section animations
+            const tl = gsap.timeline();
+            
+            tl.to('.hero-title', {
+                opacity: 1,
+                y: 0,
+                duration: 1.5,
+                ease: 'power3.out'
+            })
+            .to('.hero-subtitle', {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: 'power2.out'
+            }, '-=0.5')
+            .to('.cta-button', {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'back.out(1.7)'
+            }, '-=0.3');
+
+            // Only animate spaceship on larger screens
+            if (window.innerWidth > 768) {
+                tl.to('.spaceship', {
+                    opacity: 1,
+                    x: -150,
+                    duration: 2,
+                    ease: 'power2.inOut'
+                }, '-=1');
+
+                // Continuous spaceship movement
+                gsap.to('.spaceship', {
+                    x: '+=50',
+                    duration: 4,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut'
+                });
+            }
+
+            // Section title animations
+            gsap.utils.toArray('.section-title').forEach(title => {
+                gsap.to(title, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: title,
+                        start: 'top 80%',
+                        end: 'bottom 20%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            // Planet cards animation with responsive delays
+            const isMobile = window.innerWidth <= 768;
+            gsap.utils.toArray('.planet-card').forEach((card, index) => {
+                gsap.to(card, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    delay: isMobile ? index * 0.1 : index * 0.2,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 85%',
+                        end: 'bottom 15%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            // Mission timeline animations with responsive behavior
+            gsap.utils.toArray('.mission-item').forEach((item, index) => {
+                const isEven = index % 2 === 1;
+                const isMobile = window.innerWidth <= 768;
+                
+                gsap.to(item, {
+                    opacity: 1,
+                    x: 0,
+                    y: isMobile ? 0 : undefined,
+                    duration: 1,
+                    delay: index * (isMobile ? 0.2 : 0.3),
+                    scrollTrigger: {
+                        trigger: item,
+                        start: 'top 80%',
+                        end: 'bottom 20%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            // Planet sphere orbit animation
+            gsap.utils.toArray('.planet-sphere').forEach(sphere => {
+                gsap.to(sphere, {
+                    rotation: 360,
+                    duration: 20,
+                    repeat: -1,
+                    ease: 'none'
+                });
+            });
+
+            // Parallax effect for hero background (disable on mobile for performance)
+            if (window.innerWidth > 768) {
+                gsap.to('.hero', {
+                    backgroundPosition: '50% 100px',
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: true
+                    }
+                });
+            }
+        }
+
+        function exploreSpace() {
+            // Smooth scroll to planets section
+            gsap.to(window, {
+                scrollTo: '.planets-section',
+                duration: 2,
+                ease: 'power2.inOut'
+            });
+            
+            // Add some visual feedback
+            gsap.to('.cta-button', {
+                scale: 0.95,
+                duration: 0.1,
+                yoyo: true,
+                repeat: 1
+            });
+        }
+
+        // Responsive hover animations for planet cards
+        document.querySelectorAll('.planet-card').forEach(card => {
+            const sphere = card.querySelector('.planet-sphere');
+            const isMobile = window.innerWidth <= 768;
+            
+            card.addEventListener('mouseenter', () => {
+                if (!isMobile) {
+                    gsap.to(sphere, {
+                        scale: 1.2,
+                        rotationY: 180,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                    
+                    gsap.to(card, {
+                        y: -15,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                if (!isMobile) {
+                    gsap.to(sphere, {
+                        scale: 1,
+                        rotationY: 0,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                    
+                    gsap.to(card, {
+                        y: 0,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                }
+            });
+
+            // Touch events for mobile devices
+            if (isMobile) {
+                let isPressed = false;
+                
+                card.addEventListener('touchstart', () => {
+                    isPressed = true;
+                    gsap.to(sphere, {
+                        scale: 1.1,
+                        duration: 0.2,
+                        ease: 'power2.out'
+                    });
+                    gsap.to(card, {
+                        y: -5,
+                        duration: 0.2,
+                        ease: 'power2.out'
+                    });
+                });
+                
+                card.addEventListener('touchend', () => {
+                    if (isPressed) {
+                        isPressed = false;
+                        gsap.to(sphere, {
+                            scale: 1,
+                            duration: 0.3,
+                            ease: 'power2.out'
+                        });
+                        gsap.to(card, {
+                            y: 0,
+                            duration: 0.3,
+                            ease: 'power2.out'
+                        });
+                    }
+                });
+            }
+        });
+
+        // Handle window resize for responsive updates
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // Refresh ScrollTrigger on resize
+                ScrollTrigger.refresh();
+                
+                // Update spaceship visibility
+                const spaceship = document.querySelector('.spaceship');
+                if (window.innerWidth <= 768) {
+                    spaceship.style.display = 'none';
+                } else {
+                    spaceship.style.display = 'block';
+                }
+            }, 250);
+        });
+
+        // Add dynamic glow effect to hero title
+        function animateHeroGlow() {
+            gsap.to('.hero-title', {
+                textShadow: '0 0 50px rgba(79, 172, 254, 0.8), 0 0 100px rgba(79, 172, 254, 0.4)',
+                duration: 2,
+                yoyo: true,
+                repeat: -1,
+                ease: 'sine.inOut'
+            });
+        }
+
+        // Start glow animation after initial load
+        setTimeout(animateHeroGlow, 3000);
+    </script>
+</body>
+</html>
